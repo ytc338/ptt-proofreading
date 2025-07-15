@@ -37,9 +37,8 @@ cd ptt-workbench
 
 ### 2. Install Dependencies
 
-Install the necessary Node.js packages 
+Install the necessary Node.js packages using npm.
 ```bash
-using npm.
 npm install
 ```
 
@@ -48,7 +47,6 @@ npm install
 Create a new file named .env.local in the root directory of your project. This file will hold your secret API key.
 ```bash
 GEMINI_API_KEY=your_actual_api_key_here
-
 ```
 Replace `your_actual_api_key_here` with your real Google Gemini API key.
 
@@ -56,7 +54,6 @@ Replace `your_actual_api_key_here` with your real Google Gemini API key.
 
 ```bash
 npm run dev
-
 ```
 This will start the application with Turbopack for fast development. Open your browser and navigate to the following URL to see the application in action:  
 
