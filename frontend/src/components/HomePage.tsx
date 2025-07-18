@@ -1,7 +1,7 @@
 "use client"; // This directive is essential for components using hooks
 
-import React, { useState, useEffect, FC, ReactNode } from 'react';
-import { LoadingSpinner } from '@/components/index'; // Or the correct path to your component
+import React, { useState, FC } from 'react';
+import { LoadingSpinner, ErrorMessage, Analysis } from '@/components/index'; // Or the correct path to your component
 
 
 interface HomePageProps {

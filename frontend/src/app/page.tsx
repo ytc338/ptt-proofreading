@@ -1,27 +1,8 @@
 "use client"; // This directive is essential for components using hooks
 
-import React, { useState, useEffect, FC, ReactNode } from 'react';
-import { DetailPage, HomePage } from '@/components/index'; // Or the correct path to your component
+import React, { useState, useEffect } from 'react';
+import { DetailPage, HomePage, Analysis, AnalysisData } from '@/components/index'; // Or the correct path to your component
 
-interface AnalysisData {
-    article_title: string;
-    full_post_text: string;
-    analysis_summary: string;
-    errors_found: {
-        type: string;
-        problematic_translation: string;
-        original_sentence: string; // The key new field
-        suggested_correction: string;
-        explanation: string;
-    }[];
-}
-
-interface Analysis {
-    id: number;
-    url: string;
-    date: string;
-    data: AnalysisData;
-}
 
 export default function Home() {
     const [analyses, setAnalyses] = useState<Analysis[]>([]);
@@ -54,8 +35,8 @@ export default function Home() {
         setLoadingMessage('正在分析文章...');
 
         try {
-            // This is the updated part: calling our own API route
-            const response = await fetch('/api/analyze', {
+            const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://127.0.0.1:8000/api/analyze';
+            const response = await fetch(backendUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url }),

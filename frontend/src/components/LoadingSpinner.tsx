@@ -1,6 +1,6 @@
 "use client"; // This directive is essential for components using hooks
 
-import React, { useState, useEffect, FC, ReactNode } from 'react';
+import React, { FC } from 'react';
 
 export const LoadingSpinner: FC<{ message: string }> = ({ message }) => (
   <div className="flex items-center justify-center text-center my-8">
