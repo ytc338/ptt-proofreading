@@ -1,13 +1,34 @@
-"use client"; // This directive is essential for components using hooks
+"use client";
 
 import React, { useState, useEffect } from 'react';
-import { DetailPage, HomePage, Analysis, AnalysisData } from '@/components/index'; // Or the correct path to your component
+import { HomePage, Analysis, AnalysisData } from '@/components/index';
 
+const generateSlug = (title: string, maxLength: number = 50): string => {
+  const cleanedTitle = title
+    .toLowerCase()
+    // Remove common PTT title prefixes like [問卦] or [新聞]
+    .replace(/\\[(.*?)\\]/g, '')
+    // Remove any characters that aren't letters, numbers, or whitespace
+    .replace(/[^\p{L}\p{N}\s-]/gu, '')
+    .trim();
+
+  const words = cleanedTitle.split(/\s+/);
+  let slug = '';
+
+  // Build the slug word by word until it reaches the max length
+  for (const word of words) {
+    if ((slug + '-' + word).length > maxLength) {
+      break;
+    }
+    slug += (slug ? '-' : '') + word;
+  }
+  
+  // Fallback for empty titles
+  return slug || 'untitled';
+};
 
 export default function Home() {
     const [analyses, setAnalyses] = useState<Analysis[]>([]);
-    const [currentView, setCurrentView] = useState('home');
-    const [selectedAnalysisId, setSelectedAnalysisId] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [loadingMessage, setLoadingMessage] = useState('');
     const [error, setError] = useState<string | null>(null);
@@ -49,15 +70,17 @@ export default function Home() {
 
             const analysisResult: AnalysisData = await response.json();
             
+            const uniqueId = Date.now().toString();
+            const shortSlug = generateSlug(analysisResult.article_title);
+
             const newAnalysis: Analysis = {
-                id: Date.now(),
+                id: `${shortSlug}-${uniqueId}`,
                 url: url,
                 date: new Date().toISOString(),
                 data: analysisResult
             };
             const updatedAnalyses = [newAnalysis, ...analyses];
             saveAnalyses(updatedAnalyses);
-            handleSelectAnalysis(newAnalysis.id);
 
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
@@ -67,33 +90,16 @@ export default function Home() {
         }
     };
 
-    const handleSelectAnalysis = (id: number) => {
-        setSelectedAnalysisId(id);
-        setCurrentView('detail');
-    };
-
-    const handleBackToHome = () => {
-        setSelectedAnalysisId(null);
-        setCurrentView('home');
-    };
-
-    const selectedAnalysis = analyses.find(a => a.id === selectedAnalysisId);
-
     return (
         <main className="min-h-screen bg-gray-900 text-gray-200 p-4 sm:p-6 md:p-8">
-            <div className={`w-full mx-auto transition-all duration-300 ${currentView === 'home' ? 'max-w-6xl' : 'max-w-screen-xl'}`}>
-                {currentView === 'home' ? (
-                    <HomePage
-                        onAnalyze={handleAnalyze}
-                        onSelectAnalysis={handleSelectAnalysis}
-                        analyses={analyses}
-                        isLoading={isLoading}
-                        loadingMessage={loadingMessage}
-                        error={error}
-                    />
-                ) : (
-                    <DetailPage analysis={selectedAnalysis} onBack={handleBackToHome} />
-                )}
+            <div className="w-full mx-auto transition-all duration-300 max-w-6xl">
+                <HomePage
+                    onAnalyze={handleAnalyze}
+                    analyses={analyses}
+                    isLoading={isLoading}
+                    loadingMessage={loadingMessage}
+                    error={error}
+                />
             </div>
         </main>
     );

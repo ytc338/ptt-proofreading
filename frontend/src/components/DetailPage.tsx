@@ -18,7 +18,7 @@ export interface AnalysisData {
 }
 
 export interface Analysis {
-    id: number;
+    id: string;
     url: string;
     date: string;
     data: AnalysisData;

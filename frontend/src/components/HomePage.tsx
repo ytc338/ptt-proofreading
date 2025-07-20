@@ -1,20 +1,20 @@
-"use client"; // This directive is essential for components using hooks
+"use client";
 
 import React, { useState, FC } from 'react';
-import { LoadingSpinner, ErrorMessage, Analysis } from '@/components/index'; // Or the correct path to your component
-
+import { useRouter } from 'next/navigation';
+import { LoadingSpinner, ErrorMessage, Analysis } from '@/components/index';
 
 interface HomePageProps {
   onAnalyze: (url: string) => void;
-  onSelectAnalysis: (id: number) => void;
   analyses: Analysis[];
   isLoading: boolean;
   loadingMessage: string;
   error: string | null;
 }
 
-export const HomePage: FC<HomePageProps> = ({ onAnalyze, onSelectAnalysis, analyses, isLoading, loadingMessage, error }) => {
+export const HomePage: FC<HomePageProps> = ({ onAnalyze, analyses, isLoading, loadingMessage, error }) => {
   const [url, setUrl] = useState('');
+  const router = useRouter();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,6 +24,10 @@ export const HomePage: FC<HomePageProps> = ({ onAnalyze, onSelectAnalysis, analy
     }
     onAnalyze(url);
     setUrl('');
+  };
+
+  const handleSelectAnalysis = (id: string) => {
+    router.push(`/analysis/${id}`);
   };
 
   return (
@@ -51,7 +55,7 @@ export const HomePage: FC<HomePageProps> = ({ onAnalyze, onSelectAnalysis, analy
         <div className="space-y-4">
           {analyses.length > 0 ? (
             analyses.map(analysis => (
-              <div key={analysis.id} onClick={() => onSelectAnalysis(analysis.id)} className="bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-600 transition-colors">
+              <div key={analysis.id} onClick={() => handleSelectAnalysis(analysis.id)} className="bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-600 transition-colors">
                 <div>
                   <p className="font-semibold text-white">{analysis.data.article_title || '無標題分析'}</p>
                   <p className="text-sm text-gray-400">{analysis.url}</p>
