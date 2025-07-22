@@ -83,11 +83,30 @@ def extract_and_fetch_source(post_text: str) -> str | None:
         print(f"Failed to scrape source URL {source_url}: {e}")
         return None
 
+def extract_ptt_article_id(url: str) -> str | None:
+    """Extracts the unique article ID from a PTT URL."""
+    # Example URL: https://www.ptt.cc/bbs/Gossiping/M.1673424234.A.123.html
+    match = re.search(r"/bbs/.*/(M\.\d+\.A\.[A-Z0-9_]+)\.html", url)
+    if match:
+        return match.group(1)
+    return None
+
+def extract_title_from_text(text: str) -> str:
+    """Extracts the article title from the raw post text as a fallback."""
+    title_match = re.search(r"標題\s+(.*)", text)
+    if title_match:
+        return title_match.group(1).strip()
+    return "Untitled Analysis" # Final fallback
+
 # --- Main API Endpoint ---
 @router.post("")
 async def analyze_url(request: AnalyzeRequest):
     if not request.url or 'ptt.cc/bbs/' not in request.url:
         raise HTTPException(status_code=400, detail="A valid PTT URL is required.")
+
+    article_id = extract_ptt_article_id(request.url)
+    if not article_id:
+        raise HTTPException(status_code=400, detail="Could not extract a valid article ID from the PTT URL.")
 
     try:
         ptt_post_text = fetch_ptt_content(request.url)
@@ -97,7 +116,13 @@ async def analyze_url(request: AnalyzeRequest):
         ai_service = get_ai_service()
         analysis_result_json_string = ai_service.perform_analysis(ptt_post_text, ground_truth_original)
         
-        return json.loads(analysis_result_json_string)
+        analysis_data = json.loads(analysis_result_json_string)
+
+        # --- Fallback logic for title ---
+        if not analysis_data.get("article_title"):
+            analysis_data["article_title"] = extract_title_from_text(ptt_post_text)
+        
+        return {"article_id": article_id, "analysis": analysis_data}
 
     except HTTPException as e:
         raise e

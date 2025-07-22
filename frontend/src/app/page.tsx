@@ -3,30 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { HomePage, Analysis, AnalysisData } from '@/components/index';
 
-const generateSlug = (title: string, maxLength: number = 50): string => {
-  const cleanedTitle = title
-    .toLowerCase()
-    // Remove common PTT title prefixes like [問卦] or [新聞]
-    .replace(/\\[(.*?)\\]/g, '')
-    // Remove any characters that aren't letters, numbers, or whitespace
-    .replace(/[^\p{L}\p{N}\s-]/gu, '')
-    .trim();
-
-  const words = cleanedTitle.split(/\s+/);
-  let slug = '';
-
-  // Build the slug word by word until it reaches the max length
-  for (const word of words) {
-    if ((slug + '-' + word).length > maxLength) {
-      break;
-    }
-    slug += (slug ? '-' : '') + word;
-  }
-  
-  // Fallback for empty titles
-  return slug || 'untitled';
-};
-
 export default function Home() {
     const [analyses, setAnalyses] = useState<Analysis[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -65,22 +41,21 @@ export default function Home() {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error || 'API request failed');
+                throw new Error(errorData.detail || 'API request failed');
             }
 
-            const analysisResult: AnalysisData = await response.json();
+            const result: { article_id: string; analysis: AnalysisData } = await response.json();
             
-            const uniqueId = Date.now().toString();
-            const shortSlug = generateSlug(analysisResult.article_title);
-
             const newAnalysis: Analysis = {
-                id: `${shortSlug}-${uniqueId}`,
+                id: result.article_id,
                 url: url,
                 date: new Date().toISOString(),
-                data: analysisResult
+                data: result.analysis
             };
-            const updatedAnalyses = [newAnalysis, ...analyses];
-            saveAnalyses(updatedAnalyses);
+
+            // Replace existing analysis if ID matches, otherwise add as new
+            const updatedAnalyses = analyses.filter(a => a.id !== newAnalysis.id);
+            saveAnalyses([newAnalysis, ...updatedAnalyses]);
 
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';

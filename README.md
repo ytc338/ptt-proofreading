@@ -7,11 +7,14 @@ This tool is perfect for users who want to quickly proofread and verify the accu
 ## Core Features
 
 * **PTT Article Scraping**: Fetches the full text content from any PTT article URL.
+* **Unique Article ID**: Utilizes the native PTT article ID for persistent and unique identification of analyses, preventing duplicates.
 * **Intelligent Source Detection**: Automatically finds external source links (e.g., to news sites) within the PTT post and uses that as the ground truth for the original text, ensuring higher accuracy.
 * **Advanced AI Analysis**: Leverages the Gemini API with a fine-tuned prompt to act as a meticulous localization editor, identifying not just grammatical errors but also subtle issues in tone, nuance, and style.
 * **Annotated Post UI**: A streamlined single-view interface that displays the full post and highlights potential errors directly in the text.
 * **"Super Tooltip"**: Hovering over an error reveals a detailed tooltip with the original source sentence for context, the AI's suggested correction, and a clear explanation.
 * **Persistent Local Storage**: All analyses are saved directly in your browser, allowing you to close the tab and return to your work later.
+* **Enhanced UI for Readability**: Improved layout for article titles, allowing full titles to wrap without truncation, ensuring a clean and readable interface.
+* **Robust Title Handling**: Implemented fallback mechanisms to ensure article titles are always displayed, even if AI extraction fails.
 * **Responsive Design**: A clean, modern UI built with Tailwind CSS that works seamlessly on desktop and mobile devices.
 
 ## Technology Stack
@@ -20,8 +23,8 @@ This tool is perfect for users who want to quickly proofread and verify the accu
 * **Language**: [TypeScript](https://www.typescriptlang.org/)
 * **UI Library**: [React](https://reactjs.org/)
 * **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-* **Backend API**: Next.js API Routes
-* **Web Scraping**: [Cheerio](https://cheerio.js.org/)
+* **Backend API**: [FastAPI](https://fastapi.tiangolo.com/) (Python)
+* **Web Scraping**: [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/bs4/doc/) (Python)
 * **AI Model**: [Google Gemini API](https://ai.google.dev/)
 
 ## Setup and Installation
@@ -35,26 +38,61 @@ git clone <your-repository-url>
 cd ptt-workbench
 ```
 
-### 2. Install Dependencies
+### 2. Set Up Environment Variables
 
-Install the necessary Node.js packages using npm.
-```bash
-npm install
+Create a new file named `.env` in the root directory of your project. This file will hold your secret API key.
+
 ```
-
-### 3. Set Up Environment Variables
-
-Create a new file named .env.local in the root directory of your project. This file will hold your secret API key.
-```bash
 GEMINI_API_KEY=your_actual_api_key_here
 ```
 Replace `your_actual_api_key_here` with your real Google Gemini API key.
 
 ## Running the Application
 
-```bash
-npm run dev
-```
-This will start the application with Turbopack for fast development. Open your browser and navigate to the following URL to see the application in action:  
+### Using Docker Compose (Recommended)
 
-http://localhost:3000
+This is the easiest way to get both the frontend and backend running.
+
+1.  Ensure you have Docker and Docker Compose installed.
+2.  From the project root directory, run:
+    ```bash
+    docker-compose up --build
+    ```
+3.  Open your browser and navigate to `http://localhost:3000` to see the application in action.
+
+### Manual Setup (for Development)
+
+If you prefer to run the services manually for development purposes:
+
+**Install Dependencies:**
+
+Install the necessary Node.js packages for the frontend and Python packages for the backend.
+
+**Frontend:**
+```bash
+cd frontend
+npm install
+cd ..
+```
+
+**Backend:**
+```bash
+cd backend
+pip install -r requirements.txt
+cd ..
+```
+
+**Start Backend:**
+```bash
+cd backend
+uvicorn app.main:app --reload
+cd ..
+```
+
+**Start Frontend:**
+```bash
+cd frontend
+npm run dev
+cd ..
+```
+Open your browser and navigate to `http://localhost:3000` to see the application in action.

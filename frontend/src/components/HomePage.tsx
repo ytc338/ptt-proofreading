@@ -57,7 +57,7 @@ export const HomePage: FC<HomePageProps> = ({ onAnalyze, analyses, isLoading, lo
             analyses.map(analysis => (
               <div key={analysis.id} onClick={() => handleSelectAnalysis(analysis.id)} className="bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-600 transition-colors">
                 <div>
-                  <p className="font-semibold text-white">{analysis.data.article_title || '無標題分析'}</p>
+                  <p className="font-semibold text-white">{analysis.data.article_title || 'Untitled Analysis'}</p>
                   <p className="text-sm text-gray-400">{analysis.url}</p>
                 </div>
                 <span className="text-sm text-gray-300">{new Date(analysis.date).toLocaleDateString('en-CA')}</span>
