@@ -20,6 +20,7 @@
 *.pem
 
 # Local Environment Variables
+.env
 .env.local
 .env.development.local
 .env.test.local
@@ -39,3 +40,6 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
